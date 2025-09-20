@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart' show BuildContext,Color, Colors;
 import 'package:fluttertoast/fluttertoast.dart';
 
-showCustomToast(String? message, BuildContext context, {bool isError = true, bool isToaster = false}) {
+showCustomToast(String? message, BuildContext context, {bool isError = true}) {
   Fluttertoast.showToast(
       msg: message!,
       toastLength: Toast.LENGTH_SHORT,

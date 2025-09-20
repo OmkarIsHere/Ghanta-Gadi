@@ -1,28 +1,18 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:ghanta_gadi/data/repositories/user_repository.dart';
-import 'package:ghanta_gadi/data/services/firestore_service.dart';
 
 class AuthService {
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
-  Future<dynamic> registerUserWithEmailAndPassword(
-      {required String fullName, required String email, required String phone,required String city, required String ward, required String password}) async {
+  Future<List<dynamic>> registerUserWithEmailAndPassword({required String email, required String password}) async {
     try {
       User user = (await firebaseAuth.createUserWithEmailAndPassword(
           email: email, password: password))
           .user!;
-      final Map<String, dynamic> userData = {
-        "name": fullName,
-        "role": "citizen",
-        "email": email,
-        "phone": phone,
-        "city": city,
-        "ward": ward,
-        "createdAt": DateTime.now(),
-      };
-      return await UserRepository(FirestoreService()).createUser(user.uid, userData);
+      return [true, user.uid];
     } on FirebaseAuthException catch (e) {
-      return e.message;
+      return [false, e.message ?? "Unknown Firebase error"];
+    }catch (e) {
+      return [false, e.toString()];
     }
   }
 
