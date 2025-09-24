@@ -38,7 +38,7 @@ class MyTheme {
     ),
     colorScheme: const ColorScheme.light(
         brightness: Brightness.light,
-        primary: Color(0xff2ee400),
+        primary: Color(0xff26ac02),
         secondary: Color(0xff696a68),
         tertiary: Color(0xFF908D9A),
         primaryContainer: Color(0xFFD6E8F1),

@@ -38,7 +38,7 @@ class _SignupScreenState extends State<SignupScreen> {
       body: Consumer<AuthProvider>(
         builder: (context, provider, child) {
           return Form(
-            key: provider.formKey,
+            key: provider.signupKey,
               child: Column(
                 children: [
                   TextFormField(
@@ -57,9 +57,9 @@ class _SignupScreenState extends State<SignupScreen> {
                       contentPadding: DimensionConstant.edgeInsetH10,
                     ),
                   ).marginSymmetric(edgeInsets: DimensionConstant.edgeInsetV10),
-                  if (provider.state == LoadState.LOADING) Center(child: CircularProgressIndicator()),
-                  if (provider.state == LoadState.ERROR) Text("Failed to load cities"),
-                  if (provider.state == LoadState.LOADED) Container(
+                  if (provider.cityState == LoadState.LOADING) Center(child: CircularProgressIndicator()),
+                  if (provider.cityState == LoadState.ERROR) Text("Failed to load cities"),
+                  if (provider.cityState == LoadState.LOADED) Container(
                     padding: DimensionConstant.edgeInsetH10,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
@@ -180,13 +180,14 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                   ).marginSymmetric(edgeInsets: DimensionConstant.edgeInsetV10),
                   SizedBox(height: context.mqHeight*0.25),
-                  (provider.signUpState == LoadState.LOADED)
+                  (provider.authState == LoadState.LOADED)
                     ? CustomButton(bgColor: context.color.primary, label: 'SIGN UP', voidCallback: () async{
-                    if(!provider.formKey.currentState!.validate()) return;
+                    if(!provider.signupKey.currentState!.validate()) return;
                     await provider.signup().then((res){
-                      print("RES --> $res");
-                      if(res == true){
+                      if(res == 'success'){
                         showCustomToast("Successfully signed up", context, isError: false);
+                      }else if(res == 'fail'){
+                        showCustomToast("Something went wrong", context);
                       }else{
                         showCustomToast(res.toString(), context);
                       }

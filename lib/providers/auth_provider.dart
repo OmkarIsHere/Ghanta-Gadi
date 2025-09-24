@@ -1,11 +1,13 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show ChangeNotifier, FormState, GlobalKey;
+import 'package:flutter/foundation.dart' show ChangeNotifier;
+import 'package:flutter/material.dart' show TextEditingController, GlobalKey, FormState;
+import 'package:ghanta_gadi/core/constant/sf_constant.dart';
 import 'package:ghanta_gadi/core/extensions/validation.dart';
 import 'package:ghanta_gadi/data/repositories/location_repository.dart';
 import 'package:ghanta_gadi/data/repositories/user_repository.dart';
 import 'package:ghanta_gadi/data/services/auth_service.dart';
 import 'package:ghanta_gadi/data/services/firestore_service.dart';
 
+import '../core/helper/sf_helper.dart';
 import '../core/misc/enum.dart';
 
 class AuthProvider with ChangeNotifier{
@@ -14,7 +16,9 @@ class AuthProvider with ChangeNotifier{
   final userRepository = UserRepository(FirestoreService());
   final authService = AuthService();
 
-  final formKey = GlobalKey<FormState>();
+  final signupKey = GlobalKey<FormState>();
+  final loginKey = GlobalKey<FormState>();
+
   final nameController = TextEditingController();
   final phoneController = TextEditingController();
   final emailController = TextEditingController();
@@ -27,21 +31,21 @@ class AuthProvider with ChangeNotifier{
   List<String>? wards;
   String? selectedWard;
 
-  LoadState state = LoadState.LOADING;
-  LoadState signUpState = LoadState.LOADED;
+  LoadState cityState = LoadState.LOADING;
+  LoadState authState = LoadState.LOADED;
 
   Future<void> loadCities() async {
-    state = LoadState.LOADING;
+    cityState = LoadState.LOADING;
     cities = [];
     wards?.clear();
     cities!.add('Select City');
     notifyListeners();
     cities = await locationRepository.loadCities().onError((e,s){
-      state = LoadState.ERROR;
+      cityState = LoadState.ERROR;
       return [];
     });
 
-    state = LoadState.LOADED;
+    cityState = LoadState.LOADED;
     notifyListeners();
   }
 
@@ -70,9 +74,9 @@ class AuthProvider with ChangeNotifier{
     notifyListeners();
   }
 
-  Future<dynamic> signup() async{
+  Future<String> signup() async{
 
-    signUpState = LoadState.LOADING;
+    authState = LoadState.LOADING;
     notifyListeners();
 
     final Map<String, dynamic> userData = {
@@ -86,23 +90,75 @@ class AuthProvider with ChangeNotifier{
       "createdAt": DateTime.now(),
     };
 
-    await authService.registerUserWithEmailAndPassword(email: emailController.text.trimString, password: passwordController.text.trimString).then((result) async{
-      print("RESULT: $result");
-      if(result.first == true) {
-        await userRepository.createUser(result.last, userData).then((val){
-          resetForm();
-          signUpState = LoadState.LOADED;
-          return val;
-        });
-      }else{
-        return result[1];
+    try {
+      final result = await authService.registerUserWithEmailAndPassword(
+        email: emailController.text.trimString,
+        password: passwordController.text.trimString,
+      );
+
+      if (result.first == true) {
+        final val = await userRepository.createUser(result.last, userData);
+        resetForm();
+        authState = LoadState.LOADED;
+        notifyListeners();
+        return val ? 'success' : 'fail';
+      } else {
+        authState = LoadState.LOADED;
+        notifyListeners();
+        return result[1] ?? 'Unknown error';
       }
-    }).onError((e,s){
-      print("ERROR: ${e.toString()}");
+    } catch (e) {
+      authState = LoadState.LOADED;
+      notifyListeners();
       return e.toString();
-    });
-    signUpState = LoadState.LOADED;
+    }
+  }
+
+  Future<String> login() async{
+
+    authState = LoadState.LOADING;
     notifyListeners();
+
+    try {
+      final result = await authService.loginUserWithEmailAndPassword(
+        emailController.text.trimString,
+        passwordController.text.trimString,
+      );
+
+      if (result.first == true) {
+        final snapshot = await userRepository.getUserData(result.last);
+
+        if(snapshot.exists){
+          Map<String, dynamic>? userData = snapshot.data() as Map<String, dynamic>;
+          print("USER: ${userData["name"]}");
+          print("USER: ${userData["role"]}");
+          print("USER: ${userData["ward"]}");
+          SFHelper.set(SfConstant.uId, result.last);
+          SFHelper.set(SfConstant.uName, userData["name"]);
+          SFHelper.set(SfConstant.uEmail, userData["email"]);
+          SFHelper.set(SfConstant.uPhone, userData["phone"]);
+          SFHelper.set(SfConstant.uRole, userData["role"]);
+          SFHelper.set(SfConstant.uCity, userData["city"]);
+          SFHelper.set(SfConstant.uWard, userData["ward"]);
+          resetForm();
+          authState = LoadState.LOADED;
+          notifyListeners();
+          return 'success';
+        }else{
+          authState = LoadState.LOADED;
+          notifyListeners();
+          return 'fail';
+        }
+      } else {
+        authState = LoadState.LOADED;
+        notifyListeners();
+        return result[1] ?? 'Unknown error';
+      }
+    } catch (e) {
+      authState = LoadState.LOADED;
+      notifyListeners();
+      return e.toString();
+    }
   }
 
   void resetForm(){
@@ -111,6 +167,7 @@ class AuthProvider with ChangeNotifier{
     phoneController.clear();
     passwordController.clear();
     cnfPasswordController.clear();
+    signupKey.currentState?.reset();
   }
 
 }

@@ -16,17 +16,17 @@ class AuthService {
     }
   }
 
-  Future<dynamic> loginUserWithEmailAndPassword(String email, String password) async {
+  Future<List<dynamic>> loginUserWithEmailAndPassword(String email, String password) async {
     try {
       UserCredential userCredential = await firebaseAuth.signInWithEmailAndPassword(email: email, password: password);//).user!;
-      String? idToken = await userCredential.user!.getIdToken();
+      String? idToken = userCredential.user!.uid;
       if (idToken!.isNotEmpty) {
-        return true;
+        return [true, idToken];
       } else {
-        return false;
+        return [false,'fail'];
       }
     } on FirebaseAuthException catch (e) {
-      return e.message;
+      return [false, e.message ?? 'Unknown error'];
     }
   }
 
