@@ -143,7 +143,7 @@ class AuthProvider with ChangeNotifier{
           resetForm();
           authState = LoadState.LOADED;
           notifyListeners();
-          return 'success';
+          return userData["role"];
         }else{
           authState = LoadState.LOADED;
           notifyListeners();

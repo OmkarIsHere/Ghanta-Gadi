@@ -5,7 +5,7 @@ import 'package:ghanta_gadi/core/extensions/margin.dart';
 import 'package:ghanta_gadi/core/extensions/padding.dart';
 import 'package:ghanta_gadi/core/extensions/validation.dart';
 import 'package:ghanta_gadi/core/extensions/values.dart';
-import 'package:ghanta_gadi/core/widgets/show_custom_toast.dart';
+import 'package:ghanta_gadi/core/widgets/show_toast.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/constant/dimension_constant.dart';

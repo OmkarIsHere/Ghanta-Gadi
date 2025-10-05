@@ -1,12 +1,17 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:ghanta_gadi/core/constant/sf_constant.dart';
+import 'package:ghanta_gadi/modules/admin/admin_home.dart';
 import 'package:ghanta_gadi/providers/auth_provider.dart';
+import 'package:ghanta_gadi/providers/permission_provider.dart';
 import 'package:ghanta_gadi/routes.dart';
 import 'package:provider/provider.dart' show MultiProvider, ChangeNotifierProvider;
 
 import 'core/config/theme.dart';
 import 'core/helper/sf_helper.dart';
+import 'modules/auth/login.dart';
+import 'modules/citizen/citizen_home.dart';
+import 'modules/driver/driver_home.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,6 +22,7 @@ void main() async{
       MultiProvider(
           providers: [
             ChangeNotifierProvider(create: (_) => AuthProvider()),
+            ChangeNotifierProvider(create: (_) => PermissionProvider()),
           ],
           child: const MyApp()));
 }
@@ -30,6 +36,42 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Ghanta Gadi',
+      debugShowCheckedModeBanner: false,
+      theme: MyTheme().lightTheme,
+      onGenerateRoute: AppRouter.generateRoute,
+      home: FutureBuilder<String?>(
+        future: _getRole(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+
+          if (snapshot.hasError) {
+            print("EEE --> ${snapshot.stackTrace}");
+            return const Scaffold(
+              body: Center(child: Text('Something went wrong')),
+            );
+          }
+
+          final role = snapshot.data;
+          print("ROLE --> $role");
+          if (role == null) {
+            return const LoginScreen();
+          } else if (role == 'citizen') {
+            return const CitizenHome();
+          } else if (role == 'driver') {
+            return const DriverHome();
+          } else {
+            return const AdminHome();
+          }
+        },
+      ),
+    );
+    /*
     return FutureBuilder<String?>(
       future: _getRole(),
       builder: (context, snapshot) {
@@ -44,6 +86,7 @@ class MyApp extends StatelessWidget {
 
         // If error → show fallback screen
         if (snapshot.hasError) {
+          print("EEE --> ${snapshot.stackTrace}");
           return const MaterialApp(
             home: Scaffold(
               body: Center(child: Text('Something went wrong')),
@@ -64,7 +107,10 @@ class MyApp extends StatelessWidget {
               : AppRouter.driverHome,
           onGenerateRoute: AppRouter.generateRoute,
         );
+
       },
     );
+
+     */
   }
 }

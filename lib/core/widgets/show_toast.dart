@@ -7,8 +7,20 @@ showCustomToast(String? message, BuildContext context, {bool isError = true}) {
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
       timeInSecForIosWeb: 1,
-      backgroundColor: isError ? const Color(0xFFFF0014) : const Color(0xFF1E7C15),
+      backgroundColor: isError ? const Color(0xFFFF2B18) : const Color(
+          0xFF14BF04),
       textColor: Colors.white,
       fontSize: 16.0
+  );
+}
+
+showBasicToast(String? message, BuildContext context) {
+  Fluttertoast.showToast(
+      msg: message!,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      textColor: Colors.white,
+      fontSize: 14.0
   );
 }

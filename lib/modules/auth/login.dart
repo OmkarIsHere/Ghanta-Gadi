@@ -13,7 +13,7 @@ import '../../core/constant/dimension_constant.dart';
 import '../../core/misc/input_decoration.dart';
 import '../../core/misc/spacing.dart';
 import '../../core/widgets/custom_button.dart';
-import '../../core/widgets/show_custom_toast.dart';
+import '../../core/widgets/show_toast.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -80,8 +80,15 @@ class LoginScreen extends StatelessWidget {
                             if(!provider.loginKey.currentState!.validate()) return;
                             String result = await provider.login();
                             print("USER: Result $result");
-                            if(result == 'success'){
+                            if(result == 'citizen'){
                               showCustomToast("Successfully signed in", context, isError: false);
+                              Navigator.pushReplacementNamed(context, AppRouter.citizenHome);
+                            }else if(result == 'driver'){
+                              showCustomToast("Successfully signed in", context, isError: false);
+                              Navigator.pushReplacementNamed(context, AppRouter.driverHome);
+                            }else if(result == 'admin'){
+                              showCustomToast("Successfully signed in", context, isError: false);
+                              Navigator.pushReplacementNamed(context, AppRouter.adminHome);
                             }else if(result == 'fail'){
                               showCustomToast("User not found", context);
                             }else{

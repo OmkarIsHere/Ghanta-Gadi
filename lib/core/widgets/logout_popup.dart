@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:ghanta_gadi/core/extensions/custom_widgets.dart';
 import 'package:ghanta_gadi/core/extensions/padding.dart';
 import 'package:ghanta_gadi/core/extensions/values.dart';
+import '../../routes.dart';
 import '../constant/dimension_constant.dart';
+import '../constant/sf_constant.dart';
+import '../helper/sf_helper.dart';
 
-showLogoutPopUpDialog(BuildContext context, {required VoidCallback voidCallback}){
+showLogoutPopUpDialog(BuildContext context){
   return showDialog(
       context: context,
       builder: (context) {
@@ -14,7 +17,7 @@ showLogoutPopUpDialog(BuildContext context, {required VoidCallback voidCallback}
           content: Container(
             width: context.mqWidth*0.5,
             decoration: BoxDecoration(
-                color: context.color.background,
+                color: context.color.surface,
                 borderRadius: BorderRadius.circular(15)
             ),
             child: Column(
@@ -53,7 +56,7 @@ showLogoutPopUpDialog(BuildContext context, {required VoidCallback voidCallback}
                           'LOG OUT',
                           style: context.text.titleSmall!.copyWith( color: context.color.error)
                       ),
-                    ).expanded(flex: 1),
+                    ).inkWell(onTap:()=> _logout(context)).expanded(flex: 1),
                   ],
                 ).paddingSymmetric(edgeInsets: DimensionConstant.edgeInsetH15V15)
               ],
@@ -61,4 +64,15 @@ showLogoutPopUpDialog(BuildContext context, {required VoidCallback voidCallback}
           ),
         );
       });
+}
+
+void _logout(BuildContext context){
+  SFHelper.remove(SfConstant.uId);
+  SFHelper.remove(SfConstant.uName);
+  SFHelper.remove(SfConstant.uEmail);
+  SFHelper.remove(SfConstant.uPhone);
+  SFHelper.remove(SfConstant.uRole);
+  SFHelper.remove(SfConstant.uCity);
+  SFHelper.remove(SfConstant.uWard);
+  Navigator.pushReplacementNamed(context, AppRouter.login);
 }
