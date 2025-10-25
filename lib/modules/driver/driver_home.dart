@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../core/widgets/custom_button.dart';
-import '../../core/widgets/logout_popup.dart';
-
 class DriverHome extends StatelessWidget {
   const DriverHome({super.key});
 
@@ -12,12 +9,10 @@ class DriverHome extends StatelessWidget {
       appBar: AppBar(
         title: Text('Driver'),
       ),
-      body: Center(
-        child: CustomButton(
-          bgColor: Colors.red,
-          label: "Logout",
-          voidCallback: ()=> showLogoutPopUpDialog(context),
-        ),
+      body: Column(
+        children: [
+
+        ],
       ),
     );
   }

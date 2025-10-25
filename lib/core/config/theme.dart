@@ -45,7 +45,7 @@ class MyTheme {
         secondaryContainer: Color(0xFFE3E3E3),
         tertiaryContainer: Color(0xFFF7F7FC),
         onTertiary: Color(0xFF919191),
-        scrim: Color(0xFF54e4e2),
+        scrim: Color(0xffd7ffd3),
         shadow: Color(0xFFDEDEDE),
         outline: Color(0xFFD5D5D5),
         error: Color(0xFFC90202)

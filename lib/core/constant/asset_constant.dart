@@ -50,4 +50,12 @@ class AssetConstant{
   static const poppinsSemiBold = 'Poppins-SemiBold';
   static const poppinsBold = 'Poppins-Bold';
 
+
+/// ===============================================
+///                   Screen Name
+/// =================================================
+
+  static const createUser = 'CREATE ACCOUNT';
+  static const addDriver = 'ADD DRIVER';
+
 }

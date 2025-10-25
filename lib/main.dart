@@ -1,9 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:ghanta_gadi/core/constant/sf_constant.dart';
 import 'package:ghanta_gadi/modules/admin/admin_home.dart';
 import 'package:ghanta_gadi/providers/auth_provider.dart';
+import 'package:ghanta_gadi/providers/map_provider.dart';
 import 'package:ghanta_gadi/providers/permission_provider.dart';
+import 'package:ghanta_gadi/providers/user_provider.dart';
 import 'package:ghanta_gadi/routes.dart';
 import 'package:provider/provider.dart' show MultiProvider, ChangeNotifierProvider;
 
@@ -15,14 +18,20 @@ import 'modules/driver/driver_home.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  await SFHelper.init();
-
+  try {
+    await Firebase.initializeApp();
+    await dotenv.load(fileName: ".env");
+    await SFHelper.init();
+  }catch(e){
+    print("ERROR: ${e.toString()}");
+  }
   runApp(
       MultiProvider(
           providers: [
             ChangeNotifierProvider(create: (_) => AuthProvider()),
             ChangeNotifierProvider(create: (_) => PermissionProvider()),
+            ChangeNotifierProvider(create: (_) => MapProvider()),
+            ChangeNotifierProvider(create: (_) => UserProvider()),
           ],
           child: const MyApp()));
 }
@@ -59,6 +68,7 @@ class MyApp extends StatelessWidget {
 
           final role = snapshot.data;
           print("ROLE --> $role");
+          print("API --> ${dotenv.env['google_map_api']}");
           if (role == null) {
             return const LoginScreen();
           } else if (role == 'citizen') {

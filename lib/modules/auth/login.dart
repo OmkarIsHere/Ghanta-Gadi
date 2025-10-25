@@ -103,7 +103,12 @@ class LoginScreen extends StatelessWidget {
           ),
           VSpace(context.mqHeight* 0.02),
           GestureDetector(
-            onTap: ()=> Navigator.pushNamed(context, AppRouter.signup),
+            onTap: ()=> Navigator.pushNamed(
+                context,
+                arguments: {
+                  'name': AssetConstant.createUser,
+                },
+                AppRouter.createUser),
             child: Container(
               width: double.maxFinite,
               height: 56,

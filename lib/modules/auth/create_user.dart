@@ -14,26 +14,30 @@ import '../../core/misc/input_decoration.dart';
 import '../../core/widgets/custom_button.dart';
 import '../../providers/auth_provider.dart';
 
-class SignupScreen extends StatefulWidget {
-  const SignupScreen({super.key});
+class CreateUser extends StatefulWidget {
+  const CreateUser({super.key, required this.name});
+
+  final String name;
 
   @override
-  State<SignupScreen> createState() => _SignupScreenState();
+  State<CreateUser> createState() => _CreateUserState();
 }
 
-class _SignupScreenState extends State<SignupScreen> {
+class _CreateUserState extends State<CreateUser> {
 
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => Provider.of<AuthProvider>(context, listen: false).loadCities());
+    Future.microtask(() {
+      Provider.of<AuthProvider>(context, listen: false).loadCities();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('CREATE ACCOUNT'),
+        title: Text(widget.name),
       ),
       body: Consumer<AuthProvider>(
         builder: (context, provider, child) {

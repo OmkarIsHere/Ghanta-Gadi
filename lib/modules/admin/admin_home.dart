@@ -1,10 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:ghanta_gadi/modules/admin/driver_list.dart';
+import 'package:ghanta_gadi/modules/admin/feedback_list.dart';
+import 'package:ghanta_gadi/modules/admin/live_map.dart';
 
-import '../../core/widgets/custom_button.dart';
-import '../../core/widgets/logout_popup.dart';
-
-class AdminHome extends StatelessWidget {
+class AdminHome extends StatefulWidget {
   const AdminHome({super.key});
+
+  @override
+  State<AdminHome> createState() => _AdminHomeState();
+}
+
+class _AdminHomeState extends State<AdminHome> {
+  int selectedIndex = 0;
+  final pages = [LiveMap(), DriverList(), FeedbackList()];
+  List<BottomNavigationBarItem> bottomNavList = [
+    BottomNavigationBarItem(
+        icon: Icon(Icons.map_outlined),
+        activeIcon: Icon(Icons.map),
+        label: 'Map'
+    ),
+    BottomNavigationBarItem(
+        icon: Icon(Icons.group_outlined),
+        activeIcon: Icon(Icons.group),
+        label: 'Drivers'
+    ),
+    BottomNavigationBarItem(
+        icon: Icon(Icons.feedback_outlined),
+        activeIcon: Icon(Icons.feedback),
+        label: 'Feedback'
+    ),
+  ];
+
+  void onItemTapped(int index){
+    setState(() => selectedIndex = index);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,13 +41,14 @@ class AdminHome extends StatelessWidget {
       appBar: AppBar(
         title: Text('Admin'),
       ),
-      body: Center(
-        child: CustomButton(
-            bgColor: Colors.red,
-            label: "Logout",
-            voidCallback: ()=> showLogoutPopUpDialog(context),
-        ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: bottomNavList,
+        currentIndex: selectedIndex,
+        showSelectedLabels: true,
+        showUnselectedLabels: true,
+        onTap: (value)=> onItemTapped(value),
       ),
+      body: IndexedStack(index: selectedIndex, children:pages),
     );
   }
 }

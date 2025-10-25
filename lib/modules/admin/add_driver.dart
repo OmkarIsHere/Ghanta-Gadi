@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 
-class CitizenHome extends StatelessWidget {
-  const CitizenHome({super.key});
+class AddDriver extends StatelessWidget {
+  const AddDriver({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Citizen'),
+        title: const Text('ADD DRIVER'),
       ),
-
     );
   }
 }
