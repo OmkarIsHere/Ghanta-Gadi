@@ -74,14 +74,14 @@ class AuthProvider with ChangeNotifier{
     notifyListeners();
   }
 
-  Future<String> signup() async{
+  Future<String> signup({required String role}) async{
 
     authState = LoadState.LOADING;
     notifyListeners();
 
     final Map<String, dynamic> userData = {
       "name": nameController.text.trimString,
-      "role": "citizen",
+      "role": role,
       "email": emailController.text.trimString,
       "phone": phoneController.text.trimString,
       "password": passwordController.text.trimString,
@@ -130,9 +130,6 @@ class AuthProvider with ChangeNotifier{
 
         if(snapshot.exists){
           Map<String, dynamic>? userData = snapshot.data() as Map<String, dynamic>;
-          print("USER: ${userData["name"]}");
-          print("USER: ${userData["role"]}");
-          print("USER: ${userData["ward"]}");
           SFHelper.set(SfConstant.uId, result.last);
           SFHelper.set(SfConstant.uName, userData["name"]);
           SFHelper.set(SfConstant.uEmail, userData["email"]);
@@ -155,7 +152,7 @@ class AuthProvider with ChangeNotifier{
         return result[1] ?? 'Unknown error';
       }
     } catch (e) {
-      authState = LoadState.LOADED;
+      authState = LoadState.ERROR;
       notifyListeners();
       return e.toString();
     }

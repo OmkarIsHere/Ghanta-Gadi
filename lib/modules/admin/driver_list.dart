@@ -3,6 +3,8 @@ import 'package:ghanta_gadi/core/constant/asset_constant.dart';
 import 'package:ghanta_gadi/core/constant/dimension_constant.dart';
 import 'package:ghanta_gadi/core/extensions/values.dart';
 
+import '../../routes.dart';
+
 class DriverList extends StatelessWidget {
   const DriverList({super.key});
 
@@ -14,7 +16,14 @@ class DriverList extends StatelessWidget {
           right: 15,
           bottom: 15,
           child: GestureDetector(
-            onTap: (){},
+            onTap: (){
+              Navigator.pushNamed(
+                  context,
+                  arguments: {
+                    'name': AssetConstant.addDriver,
+                  },
+                  AppRouter.createUser);
+            },
             child: Container(
               padding: DimensionConstant.edgeInsetH10V10,
               decoration: BoxDecoration(

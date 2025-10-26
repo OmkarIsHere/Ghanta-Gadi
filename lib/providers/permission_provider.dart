@@ -13,21 +13,6 @@ class PermissionProvider with ChangeNotifier{
     _checkAllPermissions();
   }
 
-  // void setLocationPermission(bool value){
-  //   locationPermission = value;
-  //   notifyListeners();
-  // }
-  //
-  // void setActivityPermission(bool value){
-  //   activityPermission = value;
-  //   notifyListeners();
-  // }
-  //
-  // void setBatteryPermission(bool value){
-  //   batteryPermission = value;
-  //   notifyListeners();
-  // }
-
   Future<void> _checkAllPermissions() async {
     locationPermission = await Permission.locationAlways.isGranted ||
         await Permission.locationWhenInUse.isGranted;

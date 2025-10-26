@@ -7,6 +7,7 @@ import 'package:ghanta_gadi/providers/auth_provider.dart';
 import 'package:ghanta_gadi/providers/map_provider.dart';
 import 'package:ghanta_gadi/providers/permission_provider.dart';
 import 'package:ghanta_gadi/providers/user_provider.dart';
+import 'package:ghanta_gadi/providers/vehicle_provider.dart';
 import 'package:ghanta_gadi/routes.dart';
 import 'package:provider/provider.dart' show MultiProvider, ChangeNotifierProvider;
 
@@ -16,15 +17,13 @@ import 'modules/auth/login.dart';
 import 'modules/citizen/citizen_home.dart';
 import 'modules/driver/driver_home.dart';
 
+
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
-  try {
-    await Firebase.initializeApp();
-    await dotenv.load(fileName: ".env");
-    await SFHelper.init();
-  }catch(e){
-    print("ERROR: ${e.toString()}");
-  }
+  await Firebase.initializeApp();
+  await dotenv.load(fileName: ".env");
+  await SFHelper.init();
+
   runApp(
       MultiProvider(
           providers: [
@@ -32,6 +31,7 @@ void main() async{
             ChangeNotifierProvider(create: (_) => PermissionProvider()),
             ChangeNotifierProvider(create: (_) => MapProvider()),
             ChangeNotifierProvider(create: (_) => UserProvider()),
+            ChangeNotifierProvider(create: (_) => VehicleProvider()),
           ],
           child: const MyApp()));
 }
@@ -60,7 +60,6 @@ class MyApp extends StatelessWidget {
           }
 
           if (snapshot.hasError) {
-            print("EEE --> ${snapshot.stackTrace}");
             return const Scaffold(
               body: Center(child: Text('Something went wrong')),
             );
@@ -68,7 +67,6 @@ class MyApp extends StatelessWidget {
 
           final role = snapshot.data;
           print("ROLE --> $role");
-          print("API --> ${dotenv.env['google_map_api']}");
           if (role == null) {
             return const LoginScreen();
           } else if (role == 'citizen') {
@@ -81,46 +79,5 @@ class MyApp extends StatelessWidget {
         },
       ),
     );
-    /*
-    return FutureBuilder<String?>(
-      future: _getRole(),
-      builder: (context, snapshot) {
-        // While loading → show splash or progress
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const MaterialApp(
-            home: Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            ),
-          );
-        }
-
-        // If error → show fallback screen
-        if (snapshot.hasError) {
-          print("EEE --> ${snapshot.stackTrace}");
-          return const MaterialApp(
-            home: Scaffold(
-              body: Center(child: Text('Something went wrong')),
-            ),
-          );
-        }
-
-        // Loaded → decide route
-        final role = snapshot.data;
-        return MaterialApp(
-          title: 'Ghanta Gadi',
-          debugShowCheckedModeBanner: false,
-          theme: MyTheme().lightTheme,
-          initialRoute: (role == null)
-              ? AppRouter.login
-              : (role == 'citizen')
-              ? AppRouter.citizenHome
-              : AppRouter.driverHome,
-          onGenerateRoute: AppRouter.generateRoute,
-        );
-
-      },
-    );
-
-     */
   }
 }

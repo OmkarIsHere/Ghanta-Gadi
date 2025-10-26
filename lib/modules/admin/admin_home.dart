@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ghanta_gadi/modules/admin/driver_list.dart';
 import 'package:ghanta_gadi/modules/admin/feedback_list.dart';
-import 'package:ghanta_gadi/modules/admin/live_map.dart';
+import 'package:ghanta_gadi/core/widgets/live_map.dart';
 
 class AdminHome extends StatefulWidget {
   const AdminHome({super.key});

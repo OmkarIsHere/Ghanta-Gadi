@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show FilteringTextInputFormatter;
+import 'package:ghanta_gadi/core/constant/asset_constant.dart';
 import 'package:ghanta_gadi/core/extensions/custom_widgets.dart';
 import 'package:ghanta_gadi/core/extensions/margin.dart';
 import 'package:ghanta_gadi/core/extensions/padding.dart';
@@ -185,14 +186,19 @@ class _CreateUserState extends State<CreateUser> {
                   ).marginSymmetric(edgeInsets: DimensionConstant.edgeInsetV10),
                   SizedBox(height: context.mqHeight*0.25),
                   (provider.authState == LoadState.LOADED)
-                    ? CustomButton(bgColor: context.color.primary, label: 'SIGN UP', voidCallback: () async{
+                    ? CustomButton(
+                      bgColor: context.color.primary,
+                      label: (widget.name == AssetConstant.createUser)?'SIGN UP':'REGISTER DRIVER',
+                      voidCallback: () async{
                     if(!provider.signupKey.currentState!.validate()) return;
-                    await provider.signup().then((res){
-                      if(res == 'success'){
-                        showCustomToast("Successfully signed up", context, isError: false);
-                      }else if(res == 'fail'){
+                    await provider.signup(role:(widget.name == AssetConstant.createUser)? 'citizen': 'driver')
+                        .then((res) {
+                      if (res == 'success') {
+                        showCustomToast("Successfully signed up", context,
+                            isError: false);
+                      } else if (res == 'fail') {
                         showCustomToast("Something went wrong", context);
-                      }else{
+                      } else {
                         showCustomToast(res.toString(), context);
                       }
                     });

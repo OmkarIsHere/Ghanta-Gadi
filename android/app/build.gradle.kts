@@ -6,6 +6,17 @@ plugins {
     id("com.google.gms.google-services")
 }
 
+import java.util.Properties
+import java.io.FileInputStream
+
+val localProps = Properties()
+val localPropsFile = rootProject.file("local.properties")
+if (localPropsFile.exists()) {
+    localProps.load(FileInputStream(localPropsFile))
+}
+
+val googleMapApiKey: String = localProps.getProperty("google_map_api") ?: ""
+
 android {
     namespace = "com.example.ghanta_gadi"
     compileSdk = flutter.compileSdkVersion
@@ -29,6 +40,7 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        manifestPlaceholders["MAPS_API_KEY"] = googleMapApiKey
     }
 
     buildTypes {
