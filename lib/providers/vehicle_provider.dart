@@ -108,7 +108,7 @@ class VehicleProvider extends ChangeNotifier{
     try {
 
       final vehicleId = await getDriverOnDutyStatus();
-      final result = await vehicleRepository.clearDriverField(vehicleId??'');
+      final result = await vehicleRepository.clearDriverField(vehicleId);
 
       if(result){
         changeDutyState(false);

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:ghanta_gadi/modules/admin/driver_list.dart';
 import 'package:ghanta_gadi/modules/admin/feedback_list.dart';
 import 'package:ghanta_gadi/core/widgets/live_map.dart';
+import 'package:ghanta_gadi/providers/user_provider.dart' show UserProvider;
+import 'package:provider/provider.dart';
 
 class AdminHome extends StatefulWidget {
   const AdminHome({super.key});
@@ -33,6 +35,14 @@ class _AdminHomeState extends State<AdminHome> {
 
   void onItemTapped(int index){
     setState(() => selectedIndex = index);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      Provider.of<UserProvider>(context, listen: false).getAllDrivers();
+    });
   }
 
   @override

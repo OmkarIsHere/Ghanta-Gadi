@@ -41,7 +41,6 @@ class _DriverHomeState extends State<DriverHome> {
                 value: vehicleProvider.isOnDuty,
                 onChanged: (value) {
                   if (value){
-                    // vehicleProvider.startLiveTracking();
                     vehicleProvider.getVehiclesData();
                     _showInputDialog(context);
                   }else{
@@ -54,7 +53,6 @@ class _DriverHomeState extends State<DriverHome> {
                         showCustomToast("Something went wrong", context);
                       }
                     });
-                    // vehicleProvider.stopLiveTracking();
                   }
                 },
               );

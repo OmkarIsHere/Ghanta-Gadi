@@ -21,7 +21,6 @@ import 'modules/driver/driver_home.dart';
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  await dotenv.load(fileName: ".env");
   await SFHelper.init();
 
   runApp(

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' show GlobalKey, FormState, TextEditingController;
+import 'package:ghanta_gadi/models/user.dart';
 
 import '../core/misc/enum.dart';
 import '../data/repositories/location_repository.dart';
@@ -25,7 +26,9 @@ class UserProvider extends ChangeNotifier{
   String? selectedWard;
 
   LoadState cityState = LoadState.LOADING;
-  LoadState addState = LoadState.LOADED;
+  LoadState loadState = LoadState.LOADED;
+
+  List<User> drivers = [];
 
   Future<void> loadCities() async {
     cityState = LoadState.LOADING;
@@ -64,6 +67,22 @@ class UserProvider extends ChangeNotifier{
 
   void setSelectedWard(String ward) {
     selectedWard = ward;
+    notifyListeners();
+  }
+
+  Future<void> getAllDrivers() async {
+    drivers = [];
+    loadState = LoadState.LOADING;
+    notifyListeners();
+    await userRepository.getAllDrivers().then((values){
+      drivers = values;
+      loadState = LoadState.LOADED;
+      notifyListeners();
+    }).onError((e,s){
+      loadState = LoadState.ERROR;
+      notifyListeners();
+      return;
+    });
     notifyListeners();
   }
 }

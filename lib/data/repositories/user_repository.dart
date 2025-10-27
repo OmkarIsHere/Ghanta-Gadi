@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../models/user.dart';
 import '../services/firestore_service.dart';
 
 class UserRepository {
@@ -21,5 +22,21 @@ class UserRepository {
     final snapshot = await fs.usersRef.doc(id).get();
     return snapshot;
   }
+
+  Future<List<User>> getAllDrivers() async {
+    try {
+      final querySnapshot = await fs.usersRef
+          .where('role', isEqualTo: 'driver')
+          .get();
+
+      return querySnapshot.docs
+          .map((doc) => User.fromFirestore(doc))
+          .toList();
+    } catch (e) {
+      print("❌ Error fetching drivers: $e");
+      return [];
+    }
+  }
+
 
 }
