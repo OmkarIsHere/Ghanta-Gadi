@@ -57,7 +57,7 @@ class LiveLocationRepository {
     }
   }
 
-  Stream<Map<String, dynamic>?> liveVehicleLocation(String vehicleId) {
+  Stream<Map<String, dynamic>?> _liveVehicleLocation(String vehicleId) {
     return rtdb.vehicleLocationRef.child(vehicleId).onValue.map((event) {
       if (event.snapshot.exists) {
         return Map<String, dynamic>.from(event.snapshot.value as Map);
@@ -66,5 +66,18 @@ class LiveLocationRepository {
     });
   }
 
+  Stream<List<Map<String, dynamic>>> liveVehiclesLocation() {
+    return rtdb.vehicleLocationRef.onValue.map((event) {
+      if (!event.snapshot.exists) return [];
+
+      final Map<String, dynamic> data = Map<String, dynamic>.from(event.snapshot.value as Map);
+
+      return data.entries.map((e) {
+        final vehicle = Map<String, dynamic>.from(e.value);
+        vehicle['id'] = e.key; // attach the vehicle ID
+        return vehicle;
+      }).toList();
+    });
+  }
 
 }

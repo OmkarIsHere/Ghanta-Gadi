@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ghanta_gadi/modules/admin/driver_list.dart';
 import 'package:ghanta_gadi/modules/admin/feedback_list.dart';
 import 'package:ghanta_gadi/core/widgets/live_map.dart';
+import 'package:ghanta_gadi/providers/map_provider.dart';
 import 'package:ghanta_gadi/providers/user_provider.dart' show UserProvider;
 import 'package:provider/provider.dart';
 
@@ -42,7 +43,14 @@ class _AdminHomeState extends State<AdminHome> {
     super.initState();
     Future.microtask(() {
       Provider.of<UserProvider>(context, listen: false).getAllDrivers();
+      Provider.of<MapProvider>(context, listen: false).listenToVehiclesLocation();
     });
+  }
+
+  @override
+  void dispose() {
+    context.read<MapProvider>().stopListening();
+    super.dispose();
   }
 
   @override
