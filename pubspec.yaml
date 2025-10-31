@@ -35,7 +35,6 @@ dependencies:
   # Utils
   fluttertoast: ^8.2.13
   shared_preferences: ^2.5.3
-  flutter_dotenv: ^6.0.0
 
   # Firebase
   firebase_core: ^4.1.0

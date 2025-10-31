@@ -1,5 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart' show FieldValue;
+import 'package:cloud_firestore/cloud_firestore.dart' show FieldValue, SetOptions, QuerySnapshot;
 
+import '../../models/vehicle.dart';
 import '../services/firestore_service.dart';
 
 class VehicleRepository {
@@ -8,7 +9,7 @@ class VehicleRepository {
 
   VehicleRepository(this.fs);
 
-  Future<bool> addVehicle(Map<String, dynamic> data) async {
+  Future<bool> _addVehicle(Map<String, dynamic> data) async {
     try {
       await fs.vehiclesRef.add(data);
       return true;
@@ -17,7 +18,51 @@ class VehicleRepository {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getAllVehicleData() async {
+  Future<bool> _addOrUpdateVehicle(Vehicle vehicle) async {
+    try {
+      await fs.vehiclesRef.add(vehicle.toJson());
+      print("✅ Vehicle ${vehicle.vehicleId} added/updated successfully");
+      return true;
+    } catch (e) {
+      print("❌ Error adding/updating vehicle: $e");
+      return false;
+    }
+  }
+
+  Future<bool> addOrUpdateVehicle(Vehicle vehicle) async {
+    try {
+      String vehicleId = vehicle.vehicleId.isEmpty
+          ? fs.vehiclesRef.doc().id
+          : vehicle.vehicleId;
+
+      final updatedVehicle = vehicle.copyWith(vehicleId: vehicleId);
+
+      await fs.vehiclesRef
+          .doc(vehicleId)
+          .set(updatedVehicle.toJson(), SetOptions(merge: true));
+
+      print("✅ Vehicle ${updatedVehicle.vehicleId} added/updated successfully");
+      return true;
+    } catch (e) {
+      print("❌ Error adding/updating vehicle: $e");
+      return false;
+    }
+  }
+
+
+  Future<List<Vehicle>> getAllVehicles() async {
+    try {
+      QuerySnapshot snapshot = await fs.vehiclesRef.get();
+      return snapshot.docs
+          .map((doc) => Vehicle.fromJson(doc.data() as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      print("❌ Error fetching vehicles: $e");
+      return [];
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getVehiclesWithoutDriver() async {
     try {
       final snapshot = await fs.vehiclesRef.where('driver', isEqualTo: "")
           .get();

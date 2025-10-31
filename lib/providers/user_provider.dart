@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart' show GlobalKey, FormState, TextEditingController;
 import 'package:ghanta_gadi/models/user.dart';
 
 import '../core/misc/enum.dart';
@@ -11,13 +10,6 @@ class UserProvider extends ChangeNotifier{
 
   final locationRepository = LocationRepository(FirestoreService());
   final userRepository = UserRepository(FirestoreService());
-
-  final addDriverKey = GlobalKey<FormState>();
-
-  final nameController = TextEditingController();
-  final phoneController = TextEditingController();
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
 
   List<String>? cities;
   String? selectedCity;

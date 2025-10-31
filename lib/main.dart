@@ -1,6 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:ghanta_gadi/core/constant/sf_constant.dart';
 import 'package:ghanta_gadi/modules/admin/admin_home.dart';
 import 'package:ghanta_gadi/providers/auth_provider.dart';
@@ -16,7 +15,6 @@ import 'core/helper/sf_helper.dart';
 import 'modules/auth/login.dart';
 import 'modules/citizen/citizen_home.dart';
 import 'modules/driver/driver_home.dart';
-
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -65,7 +63,6 @@ class MyApp extends StatelessWidget {
           }
 
           final role = snapshot.data;
-          print("ROLE --> $role");
           if (role == null) {
             return const LoginScreen();
           } else if (role == 'citizen') {

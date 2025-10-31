@@ -28,24 +28,47 @@ class DriverList extends StatelessWidget {
                   itemCount: userProvider.drivers.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      leading: const Icon(
-                          Icons.person, color: Colors.blueAccent),
-                      title: Text(
-                        userProvider.drivers[index].name,
-                        style: context.text.labelMedium,
+                      title: RichText(
+                          text: TextSpan(
+                            text: 'Name: ',
+                            style: context.text.titleSmall,
+                            children: [
+                              TextSpan(
+                                text: userProvider.drivers[index].name,
+                                style: context.text.labelMedium,
+                              )
+                            ]
+                          )
                       ),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            "${userProvider.drivers[index].city}, ${userProvider
-                                .drivers[index].ward}",
-                            style: context.text.bodyMedium,
+                          RichText(
+                              text: TextSpan(
+                                  text: 'Location: ',
+                                  style: context.text.titleSmall,
+                                  children: [
+                                    TextSpan(
+                                      text:  "${userProvider.drivers[index].ward}, ${userProvider.drivers[index].city}",
+                                      style: context.text.labelMedium,
+                                    )
+                                  ]
+                              )
                           ),
-                          Text(userProvider.drivers[index].phone, style: context.text.bodyMedium,),
+                          RichText(
+                              text: TextSpan(
+                                  text: 'Contact: ',
+                                  style: context.text.titleSmall,
+                                  children: [
+                                    TextSpan(
+                                      text: '${userProvider.drivers[index].phone} | ${userProvider.drivers[index].email}',
+                                      style: context.text.labelMedium,
+                                    )
+                                  ]
+                              )
+                          ),
                         ],
                       ),
-                      // isThreeLine: true,
                     );
                   },
                   separatorBuilder: (context, index) {

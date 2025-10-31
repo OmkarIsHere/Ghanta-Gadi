@@ -4,13 +4,18 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../core/constant/sf_constant.dart';
+import '../core/helper/sf_helper.dart';
 import '../data/repositories/live_location_repository.dart';
+import '../data/repositories/vehicle_repository.dart';
 import '../data/services/background_service.dart';
+import '../data/services/firestore_service.dart';
 import '../data/services/realtime_service.dart';
 
 class MapProvider with ChangeNotifier{
 
   final service = FlutterBackgroundService();
+  final vehicleRepository = VehicleRepository(FirestoreService());
   final locationRepository = LiveLocationRepository(RealtimeService());
 
   final Completer<GoogleMapController> controller = Completer<GoogleMapController>();
@@ -21,8 +26,8 @@ class MapProvider with ChangeNotifier{
   Stream<List<Map<String, dynamic>>>? get locationStream => _locationStream;
 
   CameraPosition kGooglePlex = CameraPosition(
-    target: LatLng(19.48, 22.08),
-    zoom: 13,
+    target: LatLng(19.0760, 72.8777),
+    zoom: 10,
   );
 
   Future<void> startService()async {
@@ -38,10 +43,48 @@ class MapProvider with ChangeNotifier{
     _locationStream = locationRepository.liveVehiclesLocation();
     _locationStream!.listen((data) {
       vehicles = data;
-      kGooglePlex = CameraPosition(
-        target: LatLng(vehicles.first['lat'] ?? 0, vehicles.first['lng'] ?? 0),
-        zoom: 13,
-      );
+      if(vehicles.isNotEmpty){
+        kGooglePlex = CameraPosition(
+          target: LatLng(vehicles.first['lat'] ?? 0.0, vehicles.first['lng'] ?? 0.0),
+          zoom: 13,
+        );
+      }
+      notifyListeners();
+    });
+  }
+
+  Future<void> listenToDriverVehiclesLocation() async{
+    final uId = await SFHelper.get(SfConstant.uId);
+    final vehicleId = await vehicleRepository.getVehicleIdByDriver(uId?? '');
+    vehicles.clear();
+    if(vehicleId != null && vehicleId.isNotEmpty) {
+      _locationStream = locationRepository.liveVehicleLocation(vehicleId);
+      _locationStream!.listen((data) {
+        vehicles = data;
+        if (vehicles.isNotEmpty) {
+          kGooglePlex = CameraPosition(
+            target: LatLng(vehicles.first['lat'] ?? 0.0, vehicles.first['lng'] ?? 0.0),
+            zoom: 13,
+          );
+        }
+        notifyListeners();
+      });
+    }
+  }
+
+  Future<void> listenToWardVehiclesLocation() async{
+    final city = await SFHelper.get(SfConstant.uCity);
+    final ward = await SFHelper.get(SfConstant.uWard);
+    vehicles.clear();
+    _locationStream = locationRepository.liveVehiclesLocationForCitizen(city: city??'', ward: ward??'');
+    _locationStream!.listen((data) {
+      vehicles = data;
+      if(vehicles.isNotEmpty){
+        kGooglePlex = CameraPosition(
+          target: LatLng(vehicles.first['lat'] ?? 0.0, vehicles.first['lng'] ?? 0.0),
+          zoom: 13,
+        );
+      }
       notifyListeners();
     });
   }

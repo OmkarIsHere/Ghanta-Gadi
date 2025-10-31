@@ -28,7 +28,7 @@ showLogoutPopUpDialog(BuildContext context){
                   'ARE YOU SURE?',
                   style: context.text.headlineSmall,
                 ).paddingSymmetric(edgeInsets: DimensionConstant.edgeInsetH20V20),
-                Text('By signing out you won\'t be able to view or use live features', softWrap: true, style: context.text.bodyMedium,).paddingSymmetric(edgeInsets: DimensionConstant.edgeInsetH20),
+                Text('By signing out you won\'t be able to view or use the app', softWrap: true, style: context.text.bodyMedium,).paddingSymmetric(edgeInsets: DimensionConstant.edgeInsetH20),
                 Row(
                   children: [
                     Container(
@@ -41,7 +41,7 @@ showLogoutPopUpDialog(BuildContext context){
                       ),
                       child: Text(
                           'CANCEL',
-                          style: context.text.titleSmall!.copyWith(color: context.color.scrim)
+                          style: context.text.titleSmall!.copyWith(color: context.color.tertiary)
                       ),
                     ).inkWell(onTap: ()=> Navigator.pop(context)).expanded(flex: 1),
                     Container(
@@ -74,5 +74,5 @@ void _logout(BuildContext context){
   SFHelper.remove(SfConstant.uRole);
   SFHelper.remove(SfConstant.uCity);
   SFHelper.remove(SfConstant.uWard);
-  Navigator.pushReplacementNamed(context, AppRouter.login);
+  Navigator.pushNamedAndRemoveUntil(context, AppRouter.login, (Route<dynamic> route) => false);
 }

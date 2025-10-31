@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart' show ChangeNotifier;
+import 'package:flutter/material.dart' show TextEditingController, GlobalKey, FormState;
 import 'package:ghanta_gadi/core/constant/sf_constant.dart';
 import 'package:ghanta_gadi/core/helper/sf_helper.dart';
+import 'package:ghanta_gadi/models/vehicle.dart';
 
 import '../core/misc/enum.dart';
 import '../data/repositories/vehicle_repository.dart';
@@ -14,13 +16,19 @@ class VehicleProvider extends ChangeNotifier{
 
   bool isOnDuty = false;
 
-  List<Map<String, String>>? vehicles;
+  List<Map<String, String>>? vehiclesWithoutDrivers;
+  List<Vehicle> vehicles = [];
   String? selectedVehicle;
   LoadState vehicleState = LoadState.LOADING;
   LoadState onDutyState = LoadState.LOADED;
 
   List<String>? capacity= ['Empty', 'Half', 'Full'];
   String? currentCapacity;
+
+  final addVehicleKey = GlobalKey<FormState>();
+
+  final vehicleNameController = TextEditingController();
+  final vehicleNumPlateController = TextEditingController();
 
   void changeDutyState(bool value){
     isOnDuty = value;
@@ -49,21 +57,56 @@ class VehicleProvider extends ChangeNotifier{
     return vehicleId??'';
   }
 
-  Future<void> getVehiclesData() async{
+  Future<String> addVehicle() async{
     vehicleState = LoadState.LOADING;
     notifyListeners();
 
-    final snapshot = await vehicleRepository.getAllVehicleData().onError((e,s){
+    Vehicle vehicle = Vehicle(
+        vehicleId: "",
+        modelName: vehicleNameController.text.trim(),
+        numPlate: vehicleNumPlateController.text.trim(),
+        currentCapacity: "",
+        driver: "",
+        lastUpdated: DateTime.now());
+
+    try {
+      final val = await vehicleRepository.addOrUpdateVehicle(vehicle);
+      vehicleState = LoadState.LOADED;
+      vehicleNameController.clear();
+      vehicleNumPlateController.clear();
+      mapProvider.stopListening();
+      mapProvider.listenToDriverVehiclesLocation();
+      notifyListeners();
+      return val ? 'success' : 'fail';
+    } catch (e) {
+      vehicleState = LoadState.ERROR;
+      notifyListeners();
+      return e.toString();
+    }
+  }
+
+  Future<void> getAllVehicles() async{
+    vehicleState = LoadState.LOADING;
+    notifyListeners();
+    vehicles = await vehicleRepository.getAllVehicles().onError((e,s){
       vehicleState = LoadState.ERROR;
       notifyListeners();
       return [];
     });
-    // vehicles = snapshot
-    //     .where((v) => (v['driver'] ?? '').isEmpty)
-    //     .map<String>((v) => v['numPlate'] ?? '')
-    //     .where((plate) => plate.isNotEmpty)
-    //     .toList();
-    vehicles = snapshot
+    vehicleState = LoadState.LOADED;
+    notifyListeners();
+  }
+
+  Future<void> getVehiclesWithoutDriver() async{
+    vehicleState = LoadState.LOADING;
+    notifyListeners();
+
+    final snapshot = await vehicleRepository.getVehiclesWithoutDriver().onError((e,s){
+      vehicleState = LoadState.ERROR;
+      notifyListeners();
+      return [];
+    });
+    vehiclesWithoutDrivers = snapshot
         .where((v) => (v['driver'] ?? '').isEmpty)
         .map<Map<String, String>>((v) => {
       'vehicleId': v['vehicleId'] ?? '',
@@ -102,17 +145,16 @@ class VehicleProvider extends ChangeNotifier{
   }
 
   Future<bool?> removeVehicleDriver() async{
-
     onDutyState = LoadState.LOADING;
     notifyListeners();
     try {
-
       final vehicleId = await getDriverOnDutyStatus();
       final result = await vehicleRepository.clearDriverField(vehicleId);
-
       if(result){
         changeDutyState(false);
         mapProvider.stopService();
+        mapProvider.stopListening();
+        mapProvider.listenToDriverVehiclesLocation();
       }
       onDutyState = LoadState.LOADED;
       notifyListeners();

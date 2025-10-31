@@ -52,6 +52,8 @@ Future<void> onServiceStart(ServiceInstance service) async {
     final String status = speed > 2 ? "moving" : "idle";
 
     final uId = await SFHelper.get(SfConstant.uId);
+    final uCity = await SFHelper.get(SfConstant.uCity);
+    final uWard = await SFHelper.get(SfConstant.uWard);
     final vehicleId = await vehicleRepository.getVehicleIdByDriver(uId??'');
     if (vehicleId == null) {
       print("No vehicle assigned to this driver.");
@@ -66,8 +68,9 @@ Future<void> onServiceStart(ServiceInstance service) async {
       speed: speed,
       status: status,
       driverId: uId??'',
+      city: uCity??'',
+      ward: uWard??'',
     );
-
     print("Location updated: ${position.latitude}, ${position.longitude}");
   });
 

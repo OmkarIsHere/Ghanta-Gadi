@@ -8,6 +8,9 @@ class PermissionProvider with ChangeNotifier{
   bool locationPermission = false;
   bool activityPermission = false;
   bool batteryPermission = false;
+  bool checkedAllPermissions = false;
+
+  bool get allPermissionsGranted =>locationPermission && activityPermission && batteryPermission;
 
   PermissionProvider() {
     _checkAllPermissions();
@@ -20,7 +23,7 @@ class PermissionProvider with ChangeNotifier{
     activityPermission = await Permission.activityRecognition.isGranted;
 
     batteryPermission = (await DisableBatteryOptimization.isBatteryOptimizationDisabled)?? false;
-
+    checkedAllPermissions = true;
     notifyListeners();
   }
 

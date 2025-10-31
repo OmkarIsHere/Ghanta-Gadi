@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ghanta_gadi/core/extensions/custom_widgets.dart';
 import 'package:ghanta_gadi/core/extensions/margin.dart';
+import 'package:ghanta_gadi/core/extensions/padding.dart';
 import 'package:ghanta_gadi/core/extensions/values.dart';
 import 'package:ghanta_gadi/core/misc/spacing.dart';
 import 'package:ghanta_gadi/core/widgets/live_map.dart';
@@ -10,7 +11,11 @@ import 'package:provider/provider.dart' show Consumer, Provider;
 import '../../core/constant/dimension_constant.dart';
 import '../../core/misc/enum.dart';
 import '../../core/widgets/loader.dart';
+import '../../core/widgets/logout_popup.dart';
 import '../../core/widgets/show_toast.dart';
+import '../../providers/map_provider.dart';
+import '../../providers/permission_provider.dart';
+import '../../routes.dart';
 
 class DriverHome extends StatefulWidget {
   const DriverHome({super.key});
@@ -26,6 +31,11 @@ class _DriverHomeState extends State<DriverHome> {
     super.initState();
     Future.microtask(() {
       Provider.of<VehicleProvider>(context, listen: false).getDriverOnDutyStatus();
+      Provider.of<MapProvider>(context, listen: false).listenToDriverVehiclesLocation();
+      if(!Provider.of<PermissionProvider>(context, listen: false).allPermissionsGranted
+          && Provider.of<PermissionProvider>(context, listen: false).checkedAllPermissions){
+        Navigator.pushNamed(context, AppRouter.permission);
+      }
     });
   }
 
@@ -33,7 +43,7 @@ class _DriverHomeState extends State<DriverHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Driver'),
+        title: Text('DRIVER'),
         actions: [
           Consumer<VehicleProvider>(
             builder: (context, vehicleProvider, child) {
@@ -41,7 +51,7 @@ class _DriverHomeState extends State<DriverHome> {
                 value: vehicleProvider.isOnDuty,
                 onChanged: (value) {
                   if (value){
-                    vehicleProvider.getVehiclesData();
+                    vehicleProvider.getVehiclesWithoutDriver();
                     _showInputDialog(context);
                   }else{
                     vehicleProvider.removeVehicleDriver().then((res){
@@ -56,6 +66,19 @@ class _DriverHomeState extends State<DriverHome> {
                   }
                 },
               );
+            },
+          ),
+          Consumer<VehicleProvider>(
+            builder: (context, vehicleProvider, child) {
+              return Icon(Icons.logout, color: context.color.error)
+                  .paddingSymmetric(edgeInsets: DimensionConstant.edgeInsetH10)
+                  .inkWell(onTap: (){
+                if(vehicleProvider.isOnDuty){
+                  showBasicToast("First go off duty then log out", context);
+                }else{
+                  showLogoutPopUpDialog(context);
+                }
+              });
             },
           )
         ],
@@ -89,7 +112,7 @@ class _DriverHomeState extends State<DriverHome> {
                       isExpanded: true,
                       value: vehicleProvider.selectedVehicle,
                       hint: Text('Select Vehicle', style: context.text.titleSmall!.copyWith(color: context.color.tertiary),),
-                      items: vehicleProvider.vehicles!
+                      items: vehicleProvider.vehiclesWithoutDrivers!
                           .map((vehicle) =>
                           DropdownMenuItem<String>(
                               value: vehicle['vehicleId'],

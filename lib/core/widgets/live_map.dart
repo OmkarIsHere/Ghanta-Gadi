@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ghanta_gadi/core/widgets/show_toast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart' show Consumer;
 
@@ -13,7 +14,14 @@ class LiveMap extends StatelessWidget {
       builder: (context, mapProvider, child) {
 
         if (mapProvider.vehicles.isEmpty) {
-          return const Center(child: CircularProgressIndicator());
+          return GoogleMap(
+            mapType: MapType.normal,
+            myLocationEnabled: true,
+            initialCameraPosition: mapProvider.kGooglePlex,
+            onMapCreated: (GoogleMapController controller) {
+              mapProvider.controller.complete(controller);
+            },
+          );
         }
 
         final Set<Marker> markers = mapProvider.vehicles.map((vehicle) {
@@ -27,11 +35,11 @@ class LiveMap extends StatelessWidget {
             markerId: MarkerId(id),
             position: LatLng(lat, lng),
             infoWindow: InfoWindow(
-              title: "Vehicle: $id",
-              snippet: "Speed: $speed | Status: $status",
+              title: "Vehicle ID: $id",
+              snippet: "Speed: ${speed.toStringAsFixed(1)} | Status: $status",
             ),
             icon: BitmapDescriptor.defaultMarkerWithHue(
-              status == "active"
+              status == "moving"
                   ? BitmapDescriptor.hueGreen
                   : BitmapDescriptor.hueRed,
             ),
@@ -41,6 +49,7 @@ class LiveMap extends StatelessWidget {
         return GoogleMap(
           mapType: MapType.normal,
           markers: markers,
+          myLocationEnabled: true,
           initialCameraPosition: mapProvider.kGooglePlex,
           onMapCreated: (GoogleMapController controller) {
             mapProvider.controller.complete(controller);
