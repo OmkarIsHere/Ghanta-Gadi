@@ -138,8 +138,10 @@ class AuthProvider with ChangeNotifier{
           SFHelper.set(SfConstant.uCity, userData["city"]);
           SFHelper.set(SfConstant.uWard, userData["ward"]);
           resetForm();
+          await userRepository.saveUserFcmToken(result.last);
           authState = LoadState.LOADED;
           notifyListeners();
+
           return userData["role"];
         }else{
           authState = LoadState.LOADED;

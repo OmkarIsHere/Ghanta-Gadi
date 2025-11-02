@@ -1,9 +1,12 @@
 import 'dart:async' show Completer;
+import 'dart:ui' as ui show instantiateImageCodec, Codec, FrameInfo, ImageByteFormat;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../core/constant/asset_constant.dart';
 import '../core/constant/sf_constant.dart';
 import '../core/helper/sf_helper.dart';
 import '../data/repositories/live_location_repository.dart';
@@ -21,6 +24,7 @@ class MapProvider with ChangeNotifier{
   final Completer<GoogleMapController> controller = Completer<GoogleMapController>();
 
   List<Map<String, dynamic>> vehicles = [];
+  BitmapDescriptor? truckIcon;
 
   Stream<List<Map<String, dynamic>>>? _locationStream;
   Stream<List<Map<String, dynamic>>>? get locationStream => _locationStream;
@@ -29,6 +33,10 @@ class MapProvider with ChangeNotifier{
     target: LatLng(19.0760, 72.8777),
     zoom: 10,
   );
+
+  MapProvider(){
+    _loadTruckIcon();
+  }
 
   Future<void> startService()async {
     await initializeBackgroundService();
@@ -39,7 +47,26 @@ class MapProvider with ChangeNotifier{
     service.invoke('stopService');
   }
 
+  Future<void> _loadTruckIcon() async {
+    final Uint8List markerIcon = await _getBytesFromAsset(AssetConstant.garbageTruckTopView, 90);
+    truckIcon = BitmapDescriptor.bytes(markerIcon);
+    notifyListeners();
+  }
+
+  Future<Uint8List> _getBytesFromAsset(String path, int width) async {
+    final ByteData data = await rootBundle.load(path);
+    final ui.Codec codec = await ui.instantiateImageCodec(
+      data.buffer.asUint8List(),
+      targetWidth: width,
+    );
+    final ui.FrameInfo fi = await codec.getNextFrame();
+    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
+        .buffer
+        .asUint8List();
+  }
+
   void listenToVehiclesLocation() {
+    vehicles.clear();
     _locationStream = locationRepository.liveVehiclesLocation();
     _locationStream!.listen((data) {
       vehicles = data;

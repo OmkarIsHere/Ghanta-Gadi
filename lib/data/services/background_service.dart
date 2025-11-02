@@ -8,6 +8,7 @@ import 'package:ghanta_gadi/data/services/realtime_service.dart';
 import '../../core/constant/sf_constant.dart';
 import '../../core/helper/sf_helper.dart';
 import '../repositories/live_location_repository.dart';
+import '../repositories/user_repository.dart';
 import '../repositories/vehicle_repository.dart';
 import 'firestore_service.dart' show FirestoreService;
 
@@ -37,6 +38,7 @@ Future<void> onServiceStart(ServiceInstance service) async {
 
   final liveLocationRepository = LiveLocationRepository(RealtimeService());
   final vehicleRepository = VehicleRepository(FirestoreService());
+  final userRepository = UserRepository(FirestoreService());
   final locationService = LocationService();
 
   Timer? timer;
@@ -52,6 +54,7 @@ Future<void> onServiceStart(ServiceInstance service) async {
     final String status = speed > 2 ? "moving" : "idle";
 
     final uId = await SFHelper.get(SfConstant.uId);
+    final uName = await SFHelper.get(SfConstant.uName);
     final uCity = await SFHelper.get(SfConstant.uCity);
     final uWard = await SFHelper.get(SfConstant.uWard);
     final vehicleId = await vehicleRepository.getVehicleIdByDriver(uId??'');
@@ -68,9 +71,17 @@ Future<void> onServiceStart(ServiceInstance service) async {
       speed: speed,
       status: status,
       driverId: uId??'',
+      driverName: uName??'',
       city: uCity??'',
       ward: uWard??'',
+      direction: position.heading
     );
+
+    await userRepository.notifyNearbyUsers(
+        vehicleLat: position.latitude,
+        vehicleLng: position.longitude,
+        vehicleId: vehicleId);
+
     print("Location updated: ${position.latitude}, ${position.longitude}");
   });
 

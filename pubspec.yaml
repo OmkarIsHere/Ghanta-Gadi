@@ -35,6 +35,7 @@ dependencies:
   # Utils
   fluttertoast: ^8.2.13
   shared_preferences: ^2.5.3
+  flutter_local_notifications: ^19.5.0
 
   # Firebase
   firebase_core: ^4.1.0
@@ -42,13 +43,18 @@ dependencies:
   firebase_messaging: ^16.0.1
   cloud_firestore: ^6.0.1
   firebase_database: ^12.0.1
+  geoflutterfire_plus: ^0.0.33
 
-  # Google Map
+  # Google
+  googleapis_auth: ^2.0.0
   google_maps_flutter: ^2.13.1
 
   # Background services
   flutter_background_service: ^5.1.0
   geolocator: ^14.0.2
+
+  #Network
+  http: ^1.5.0
 
 dev_dependencies:
   flutter_test:
@@ -63,6 +69,7 @@ flutter:
     - assets/images/
     - assets/fonts/
     - assets/svgs/
+    - assets/json/
 #    - .env
 
   fonts:

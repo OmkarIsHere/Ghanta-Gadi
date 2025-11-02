@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ghanta_gadi/core/extensions/custom_widgets.dart';
 import 'package:ghanta_gadi/core/extensions/padding.dart';
 import 'package:ghanta_gadi/core/extensions/values.dart';
+import 'package:ghanta_gadi/data/services/notification_service.dart';
 import '../../routes.dart';
 import '../constant/dimension_constant.dart';
 import '../constant/sf_constant.dart';
@@ -67,6 +68,7 @@ showLogoutPopUpDialog(BuildContext context){
 }
 
 void _logout(BuildContext context){
+  NotificationService.deleteToken();
   SFHelper.remove(SfConstant.uId);
   SFHelper.remove(SfConstant.uName);
   SFHelper.remove(SfConstant.uEmail);
