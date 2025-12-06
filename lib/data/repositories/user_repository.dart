@@ -27,24 +27,21 @@ class UserRepository {
     }
   }
 
-  Future<void> saveUserHomeLocation({
+  Future<bool> saveUserHomeLocation({
     required String userId,
     required double lat,
     required double lng,
   }) async {
-
     final geoPoint = GeoFirePoint(GeoPoint(lat, lng));
-
     final userData = {
       'homeLocation': geoPoint.data,
       'lat': lat,
       'lng': lng,
     };
-
-    await fs.usersRef.doc(userId).update(userData);
+    await fs.usersRef.doc(userId).update(userData).onError((e,s)=> false);
     print('✅ Home location saved for user $userId');
+    return true;
   }
-
 
   Future<DocumentSnapshot> getUserData(String id) async {
     final snapshot = await fs.usersRef.doc(id).get();
